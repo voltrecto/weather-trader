@@ -4,8 +4,8 @@ from pathlib import Path
 from datetime import date, timedelta
 
 # Config
-LAT = 40.7128
-LON = -74.0060
+LAT = 40.7826
+LON = -73.9656
 START_DATE = "2021-01-01"
 END_DATE = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
 HISTORICAL_PATH = Path(f"data/raw/nyc_openmeteo_historical_{START_DATE}_{END_DATE}.csv")
