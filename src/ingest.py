@@ -1,26 +1,29 @@
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 import requests
 import pandas as pd
-from pathlib import Path
+from config.settings import CITIES
+
 from datetime import date, timedelta
 
 # Config
-LAT = 40.7826
-LON = -73.9656
 START_DATE = "2021-01-01"
 END_DATE = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
-HISTORICAL_PATH = Path(f"data/raw/nyc_openmeteo_historical_{START_DATE}_{END_DATE}.csv")
-FORECAST_PATH = Path("data/raw/nyc_nws_forecast.csv")
 
-def fetch_historical():
+def fetch_historical(city_key):
     url = "https://archive-api.open-meteo.com/v1/archive"
-    
+    city = CITIES[city_key]
+    path = Path(f"data/raw/{city_key.lower()}_openmeteo_historical.csv")    
+
     params = {
-        "latitude": LAT,
-        "longitude": LON,
+        "latitude": city["lat"],
+        "longitude": city["lon"],
         "start_date": START_DATE,
         "end_date":  END_DATE,
         "daily": ["temperature_2m_max", "temperature_2m_min"],
-        "timezone": "America/New_York",
+        "timezone": city["timezone"],
         "temperature_unit": "fahrenheit"
     }
     
@@ -34,16 +37,17 @@ def fetch_historical():
         "temp_min": data["daily"]["temperature_2m_min"]
     })
     
-    HISTORICAL_PATH.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(HISTORICAL_PATH, index=False)
-    print(f"Saved {len(df)} rows to {HISTORICAL_PATH}")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(path, index=False)
+    print(f"Saved {len(df)} rows to {path}")
     return df
 
-def fetch_nws_forecast():
+def fetch_nws_forecast(city_key):
 
-    # Point metadata
+    city = CITIES[city_key]
+    path = Path(f"data/raw/{city_key.lower()}_nws_forecast.csv")
 
-    points_url = f"https://api.weather.gov/points/{LAT},{LON}"
+    points_url = f"https://api.weather.gov/points/{city['lat']},{city['lon']}"
     headers = {"User-Agent": "weather-trader/1.0"}
     
     points_response = requests.get(points_url, headers=headers)
@@ -76,11 +80,12 @@ def fetch_nws_forecast():
         })
 
     df = pd.DataFrame(rows)
-    FORECAST_PATH.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(FORECAST_PATH, index=False)
-    print(f"Saved {len(df)} rows to {FORECAST_PATH}")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(path, index=False)
+    print(f"Saved {len(df)} rows to {path}")
     return df
 
 if __name__ == "__main__":
-    fetch_historical()
-    fetch_nws_forecast()
+    for key in CITIES:
+        fetch_historical(key)
+        fetch_nws_forecast(key)
