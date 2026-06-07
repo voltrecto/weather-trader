@@ -1,9 +1,9 @@
 # Weather Trader
 
-A weather-based edge detection system for Kalshi temperature prediction markets.
+Detecting mispriced temperature brackets on Kalshi prediction markets.
 
 ## Stack
-Python 3.11, pandas, scikit-learn, Open-Meteo API, NWS API, Jupyter
+Python, pandas, scikit-learn, Open-Meteo API, NWS API, Jupyter
 
 ## Setup
 1. Clone the repo
@@ -11,8 +11,14 @@ Python 3.11, pandas, scikit-learn, Open-Meteo API, NWS API, Jupyter
 3. Activate: `venv\Scripts\activate`
 4. Install dependencies: `pip install -r requirements.txt`
 
+## Structure
+- `config/` — city config (coordinates, timezones, settlement stations)
+- `src/` — pipeline scripts (ingest, features, model, signals, backtest)
+- `notebooks/` — analysis and visualization
+- `data/` — raw and processed data (gitignored)
+
 ## Progress
 - [x] Project structure
-- [x] Virtual environment
-- [x] GitHub setup
-- [ ] Data ingestion (Open-Meteo + NWS)
+- [x] City config (20 cities, Kalshi settlement stations)
+- [x] Data ingestion (Open-Meteo historical + NWS forecast)
+- [ ] Feature engineering
